@@ -24,14 +24,32 @@ public class Main {
 			storage.insert(event);
 		}
 		
-		System.out.println("terminou de inserir tudo");
+		for( int i = 0; i < testAmount; i++) {
+			eventList[i] = new Event("extracao", (100 * i + i/2));
+		}
 		
-		storage.showAll();
+		for(Event event: eventList) {
+			storage.insert(event);
+		}
+		EventIterator iter = storage.query("venda", 100, 500);
 		
-		System.out.println("testando remocao");
+		iter.moveNext();
+		try {
+			System.out.println(iter.current().timestamp());
+		}
+		catch(IllegalStateException e) {
+			System.out.println(e.getError());
+		}
+		
+		try {
+			iter.remove();
+		}
+		catch(IllegalStateException e) {
+			System.out.println(e.getError());
+		}
 		
 		storage.removeAll("venda");
-		
+		iter.remove();
 		storage.showAll();
 		
 	}

@@ -1,7 +1,5 @@
 package net.intelie.challenges;
 
-//import java.util.AbstractMap;
-//import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,10 +50,10 @@ public class EventStorage implements EventStore {
 				iterableElements.add(e);
 			}
 			
+			
 		}
 		
-		
-		return null;
+		return new EventQuery(iterableElements, searchList);
 	}
 	
 	public void showAll() {
