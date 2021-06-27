@@ -101,7 +101,7 @@ public class EventQueryTest {
 		}
 	}
 	
-	
+	@Test
 	public void removeTest2() {
 		//remove() behavior if called before moveNext()
 		

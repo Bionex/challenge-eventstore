@@ -42,7 +42,6 @@ public class EventQuery implements EventIterator {
 			
 			while(iterator.hasNext()) {//find the next event that fit the parameters
 				temp = iterator.next();
-				System.out.println(temp.timestamp() + " " + temp.type());
 				if(temp.timestamp() >= startTime && temp.timestamp() < endTime) {
 					current = temp;
 					typeMutex.get().unlock();//unlock the access to the set of events of the type of the event
