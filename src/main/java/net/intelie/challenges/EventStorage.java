@@ -105,7 +105,7 @@ public class EventStorage implements EventStore {
 		if(fitQuantity == 0)
 			return null;
 		
-		return new EventQuery(iterableElements, searchList);
+		return new EventQuery(iterableElements, searchList, mutex);
 	}
 	
 	public void showAll() {
