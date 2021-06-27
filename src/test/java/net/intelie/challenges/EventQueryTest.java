@@ -27,10 +27,11 @@ public class EventQueryTest {
 		
 		
 	}
+	
 	@Test
 	public void moveNextTest() {
 
-		query = storage.query("some_type", 123L, 123L);
+		query = storage.query("some_type", 123L, 124L);
 		
 		moveNextResult = query.moveNext();//there is one element in the query so must return true;
 		assertTrue(moveNextResult);
@@ -44,8 +45,8 @@ public class EventQueryTest {
 	
 	@Test
 	public void currentTest() {
-		//shows normal current() behaviour
-		query = storage.query("some_type", 123L, 125L);
+		//shows normal current() behavior
+		query = storage.query("some_type", 123L, 126L);
 		
 		int counter = 0;
 		while(query.moveNext()) {
@@ -71,7 +72,7 @@ public class EventQueryTest {
 	@Test
 	public void removeTest() {
 		// normal remove() behavior
-		query = storage.query("some_type", 123L, 125L);
+		query = storage.query("some_type", 123L, 200L);
 		
 		int counter = 0;
 		while(query.moveNext()) {
@@ -100,7 +101,7 @@ public class EventQueryTest {
 		}
 	}
 	
-	@Test
+	
 	public void removeTest2() {
 		//remove() behavior if called before moveNext()
 		

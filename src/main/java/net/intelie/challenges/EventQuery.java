@@ -1,23 +1,28 @@
 package net.intelie.challenges;
 
-import java.util.TreeSet;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 
 public class EventQuery implements EventIterator {
-	private TreeSet<Event> eventList;// a list of the events of this type and that fits the required startTime and endTime;
 	private Event current = null;//the object that is currently being ref'ed by the query;
-	private WeakReference<HashSet<Event>> storeRef;	//a reference to the set of the type of the Event;
+	private WeakReference<LinkedHashSet<Event>> storeRef;	//a reference to the set of the type of the Event;
 	private WeakReference<ReentrantLock> typeMutex;// a reference to the lock of events of this type;
 	private ReentrantLock queryMutex;// a lock to the query itself, so things that change the eventList can't be ran simultaneously
+	private Iterator<Event> iterator;
+	private long startTime;
+	private long endTime;
 	
-	EventQuery(TreeSet<Event> events,HashSet<Event> reference, ReentrantLock typeMutex){
-		this.eventList = events;
-		this.storeRef = new WeakReference<HashSet<Event>>(reference);
+	
+	EventQuery(LinkedHashSet<Event> reference, ReentrantLock typeMutex, long startTime, long endTime){
+		this.storeRef = new WeakReference<LinkedHashSet<Event>>(reference);
 		this.queryMutex = new ReentrantLock();
 		this.typeMutex = new WeakReference<ReentrantLock>(typeMutex);
+		this.iterator = storeRef.get().iterator();
+		this.startTime = startTime;
+		this.endTime = endTime;
 	}
 	
 	
@@ -31,13 +36,22 @@ public class EventQuery implements EventIterator {
 		
 		try {
 			queryMutex.lock();// lock the EventQuery object to be accessible only by the thread currently executing this method
+			typeMutex.get().lock();//lock the changes of the type of the event
 			
-			current = eventList.pollFirst(); // remove the first element from the list of events in the query and assign it to 
-				//be the current
-			if(current == null){
-				return false; // if current is null it means there was no event in the eventList of the query;
+			Event temp;
+			
+			while(iterator.hasNext()) {//find the next event that fit the parameters
+				temp = iterator.next();
+				System.out.println(temp.timestamp() + " " + temp.type());
+				if(temp.timestamp() >= startTime && temp.timestamp() < endTime) {
+					current = temp;
+					typeMutex.get().unlock();//unlock the access to the set of events of the type of the event
+					return true;
+				}
 			}
-			return true;  // there was an event;
+			typeMutex.get().unlock();
+			
+			return false;
 		}
 		finally {
 			queryMutex.unlock(); // unlock the EventQuery to be used by other threads after returning the boolean value
@@ -80,7 +94,7 @@ public class EventQuery implements EventIterator {
 			typeMutexTemp.lock();//lock all the operations on the events of this type
 		
 			if(current != null) {
-				storeRef.get().remove(current); // remove the Event from the HashSet ref'ed by storeRef.
+				iterator.remove(); // remove the Event from the HashSet ref'ed by storeRef.
 				return;
 			}
 		

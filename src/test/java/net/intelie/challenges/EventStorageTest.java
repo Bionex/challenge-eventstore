@@ -49,7 +49,7 @@ public class EventStorageTest {
 		
 		storage.insert(expected[0]);
 		
-		query = storage.query("some_type", 123L, 123);
+		query = storage.query("some_type", 123L, 125L);
 		
 		while(query.moveNext()) {
 			result = query.current();

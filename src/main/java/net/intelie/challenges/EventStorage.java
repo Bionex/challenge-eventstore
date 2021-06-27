@@ -1,21 +1,21 @@
 package net.intelie.challenges;
 
-import java.util.TreeSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 
+
 public class EventStorage implements EventStore {
 
-    private HashMap<String,HashSet<Event>> storage;
+    private HashMap<String,LinkedHashSet<Event>> storage;
     private HashMap<String, ReentrantLock> locks;
     private ReentrantLock mainMutex;
 	
     public EventStorage() {
-    	this.storage = new HashMap<String, HashSet<Event>>();
+    	this.storage = new HashMap<String, LinkedHashSet<Event>>();
     	this.locks = new HashMap<String, ReentrantLock>();
     	this.mainMutex = new ReentrantLock();
     	
@@ -28,7 +28,7 @@ public class EventStorage implements EventStore {
 		mainMutex.lock();
 		
 		if (!storage.containsKey(eventType)) {
-			HashSet<Event> eventSet = new HashSet<Event>();
+			LinkedHashSet<Event> eventSet = new LinkedHashSet<Event>();
 			storage.put(eventType, eventSet);
 			locks.put(eventType, new ReentrantLock());
 		}
@@ -70,9 +70,6 @@ public class EventStorage implements EventStore {
 
 	@Override
 	public EventIterator query(String type, long startTime, long endTime) {
-		TreeSet<Event> iterableElements = new TreeSet<Event>();
-		int fitQuantity = 0;
-		
 		
 		try {
 			mainMutex.lock();
@@ -85,27 +82,9 @@ public class EventStorage implements EventStore {
 		}
 		
 		ReentrantLock mutex = locks.get(type);
+		LinkedHashSet<Event> events = storage.get(type);
 		
-		mutex.lock();
-		HashSet<Event> searchList = storage.get(type);		
-		Iterator<Event> iter = searchList.iterator();
-		
-		while(iter.hasNext()) {
-			Event e = (Event) iter.next();
-			long eventTime = e.timestamp();
-			
-			if(eventTime <= endTime && eventTime >= startTime) {
-				iterableElements.add(e);
-				fitQuantity += 1;
-			}
-		}
-		
-		mutex.unlock();
-		
-		if(fitQuantity == 0)
-			return null;
-		
-		return new EventQuery(iterableElements, searchList, mutex);
+		return new EventQuery(events, mutex, startTime, endTime);
 	}
 	
 	public void showAll() {
