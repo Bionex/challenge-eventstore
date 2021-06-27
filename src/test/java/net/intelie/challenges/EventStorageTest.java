@@ -115,7 +115,7 @@ public class EventStorageTest {
 		storage.insert(expected[2]);
 		storage.insert(expected[1]);
 		
-		query = storage.query("some_type", 123L, 124L);
+		query = storage.query("some_type", 123L, 125L);
 		
 		int counter = 0;
 		while(query.moveNext()) {

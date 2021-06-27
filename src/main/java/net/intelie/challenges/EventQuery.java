@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class EventQuery implements EventIterator {
 	private Event current = null;//the object that is currently being ref'ed by the query;
-	private WeakReference<LinkedHashSet<Event>> storeRef;	//a reference to the set of the type of the Event;
 	private WeakReference<ReentrantLock> typeMutex;// a reference to the lock of events of this type;
 	private ReentrantLock queryMutex;// a lock to the query itself, so things that change the eventList can't be ran simultaneously
 	private Iterator<Event> iterator;
@@ -17,10 +16,9 @@ public class EventQuery implements EventIterator {
 	
 	
 	EventQuery(LinkedHashSet<Event> reference, ReentrantLock typeMutex, long startTime, long endTime){
-		this.storeRef = new WeakReference<LinkedHashSet<Event>>(reference);
 		this.queryMutex = new ReentrantLock();
 		this.typeMutex = new WeakReference<ReentrantLock>(typeMutex);
-		this.iterator = storeRef.get().iterator();
+		this.iterator = reference.iterator();
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
@@ -93,7 +91,7 @@ public class EventQuery implements EventIterator {
 			typeMutexTemp.lock();//lock all the operations on the events of this type
 		
 			if(current != null) {
-				iterator.remove(); // remove the Event from the HashSet ref'ed by storeRef.
+				iterator.remove(); // remove the Event from the LinkedHashSet ref'ed by the iterator.
 				return;
 			}
 		

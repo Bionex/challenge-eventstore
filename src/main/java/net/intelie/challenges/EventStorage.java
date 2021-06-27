@@ -1,9 +1,7 @@
 package net.intelie.challenges;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 

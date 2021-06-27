@@ -1,0 +1,65 @@
+Method Analysis:
+	EventStorage:
+		insert:
+			Time: O(1) constant, HashMap.constainsKey() and .get() are O(1) and LinkedHashMap.add() is also O(1)
+			Memory: O(1)
+			
+		removeAll:
+			Time: O(1), the entire LinkedHashMap of the given type is removed and HashMap.remove() is a O(1) operation,
+				there will be a cost from garbage collector to deallocate all the referenced objects so if we take this into
+				consideration it would be O(n) where n is the amount of Events of the given type
+			Memory: O(1)
+		
+		query:
+			Time: O(1) constant
+			Memory: O(1) constant
+			
+	EventQuery:
+		moveNext:
+			Time: O(n) where n is the number of events of the queried type
+			Memory: O(1) constant
+	
+		current:
+			Time: O(1) constant
+			Memory: O(1) constant
+		
+		remove:
+			Time: O(1) constant, iterator.remove() is a O(1) operation
+			Memory: O(1) constant
+		
+		
+Design Choices:
+	Keeping all the events of the same type together, allows we to do a very fast removeAll operation and saves a lot of time in
+	the query method, thus, I used HashMap to separate them in different LinkedHashSet. Keeping them separate also add the advantage
+	of being able to do access/change operations of different types simultaneously safely as long as the operation is not one that change
+	map itself. The cons of this approach is that more memory need to be used to Map all the Sets containing the Events, roughly a String of
+	Event.type().size() size worth of memory, also keeping one lock for each type add a few more memory cost to the problem however it pays
+	out in the end, the HashMap used for the maps could also be in the main HashMap that stores the events, this way only one sting would be
+	stored instead of two as currently it is, however it would need to use something like HashMap<String,Pair<ReentrantLock,LinkedHashSet>>
+	which add more complexity so the code becomes harder to read.
+	
+	HashMap was used to map the type to the list of the events itself because of its fastness, with the basics operations being O(1),  the 
+	big disadvantage of using Hash is the messyness of the elements, but we don't care for the order of the elements in the map in this 
+	situation so its a very good approach.
+	
+	Using LinkedHashSet keeps the order of the insertion of the elements in the Set, so it counters one of the mains disadvantages of using
+	Hash while still keeping most of the its speed, the drawback is that it uses a bit more memory than HashSet due to keeping a double linked
+	list through all the entries of the set.
+	
+	ReentrantLock is used to keep the thread waiting if there is already a thread accessing the HashMap/LinkedHashSet.
+	
+	WeakReference is used to keep a reference to an object but still making it elegible to garbage collection if the strong referece dies
+	
+	Iterator is a simple Iterator class that was used to iterate over the LinkedHashSet elements.
+	
+Thread-Safety:
+	All the access, changes, insertions and removes must first acquire the respective lock. If its something that will change main map or something
+	that need the main map to keep the currently value while it will lookup, it need to get the main lock of the EventStore. When it is something
+	that will change or must keep the value intact while it access in the LinkedHashMap of a type, it will need to acquire the lock of the
+	respective type.
+	Following those 2 things will guarantee thread-safety
+	
+	
+	
+	
+	
