@@ -73,7 +73,7 @@ public class EventQuery implements EventIterator {
 			queryMutex.unlock(); // unlock the EventQuery object to be usable by other threads
 		}
 		throw new IllegalStateException("current() called before moveNext()"); // throw exception if you call the method before 
-			//moveNext or if there is no more events in the eventList
+			//calling moveNext
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class EventQuery implements EventIterator {
 		
 		
 		throw new IllegalStateException("remove() called before moveNext()");// throw exception if current == null, moveNext() was
-			//was not called or the eventList reached the end;
+			//was not called yet
 
 	}
 
