@@ -2,9 +2,11 @@ package net.intelie.challenges;
 
 public class IllegalStateException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 1L;
 	
-	IllegalStateException(String msg){		
+	
+	public IllegalStateException(String msg){
 		super(msg);
 	}
+
 }
