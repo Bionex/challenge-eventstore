@@ -49,10 +49,18 @@ public class EventStorage implements EventStore {
 	//remove all Events of a type
 	public void removeAll(String type) {
 		
+
 		mainMutex.lock();
+		
+		if( !storage.containsKey(type)) {
+			mainMutex.unlock();
+			return;
+		}
+		
 		ReentrantLock mutex = locks.get(type);
 		
 		mutex.lock();
+		
 		storage.remove(type);
 		locks.remove(type);
 		
